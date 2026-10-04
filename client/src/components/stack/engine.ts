@@ -28,7 +28,7 @@ type Body = {
 
 type Drag = {
   id: string;
-  mode: "pointer" | "keyboard";
+  mode: 'pointer' | 'keyboard';
   pointerId: number;
   offX: number;
   offY: number;
@@ -48,8 +48,7 @@ export type Callbacks = {
   announce(message: string): void;
 };
 
-const clamp = (v: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, v));
+const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
 // Полунеявный Эйлер: устойчив при жёстких пружинах и маленьком шаге.
 function spring(x: number, v: number, target: number, k: number, c: number, dt: number) {
@@ -93,13 +92,22 @@ export class StackEngine {
     this.order.forEach((id, i) => {
       if (this.bodies.has(id)) return;
       const b: Body = {
-        x: 0, y: i * PITCH, r: 0, s: 1, o: 0,
-        vx: 0, vy: 0, vr: 0, vs: 0,
-        wake: 0, flying: false, num: "", z: -1,
+        x: 0,
+        y: i * PITCH,
+        r: 0,
+        s: 1,
+        o: 0,
+        vx: 0,
+        vy: 0,
+        vr: 0,
+        vs: 0,
+        wake: 0,
+        flying: false,
+        num: '',
+        z: -1,
       };
       const dir = this.entrances.get(id);
       if (dir !== undefined) {
-        // Возвращается с той стороны, куда улетела.
         b.x = dir * 360;
         b.r = dir * 14;
         this.entrances.delete(id);
@@ -143,9 +151,19 @@ export class StackEngine {
 
     const index = this.order.indexOf(id);
     this.drag = {
-      id, mode: "pointer", pointerId: e.pointerId,
-      offX, offY, px, py, t: e.timeStamp, vx: 0, vy: 0,
-      index, from: index, width: rect.width,
+      id,
+      mode: 'pointer',
+      pointerId: e.pointerId,
+      offX,
+      offY,
+      px,
+      py,
+      t: e.timeStamp,
+      vx: 0,
+      vy: 0,
+      index,
+      from: index,
+      width: rect.width,
     };
     b.vx = b.vy = 0;
     this.kick();
@@ -153,7 +171,7 @@ export class StackEngine {
 
   pointerMove(e: PointerEvent) {
     const d = this.drag;
-    if (!d || d.mode !== "pointer" || e.pointerId !== d.pointerId) return;
+    if (!d || d.mode !== 'pointer' || e.pointerId !== d.pointerId) return;
     const rect = this.container.getBoundingClientRect();
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
@@ -176,7 +194,7 @@ export class StackEngine {
 
   pointerUp(e: PointerEvent) {
     const d = this.drag;
-    if (!d || d.mode !== "pointer" || e.pointerId !== d.pointerId) return;
+    if (!d || d.mode !== 'pointer' || e.pointerId !== d.pointerId) return;
     // Остановился перед отпусканием — значит, не бросок.
     const fresh = e.timeStamp - d.t < 80;
     const vx = fresh ? clamp(d.vx, -3000, 3000) : 0;
@@ -196,10 +214,10 @@ export class StackEngine {
 
   keyDown(id: string, e: KeyboardEvent) {
     const d = this.drag;
-    if (d?.mode === "keyboard" && d.id === id) {
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    if (d?.mode === 'keyboard' && d.id === id) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
-        const step = e.key === "ArrowUp" ? -1 : 1;
+        const step = e.key === 'ArrowUp' ? -1 : 1;
         const next = clamp(d.index + step, 0, this.order.length - 1);
         if (next !== d.index) {
           d.index = next;
@@ -208,10 +226,10 @@ export class StackEngine {
           this.cb.announce(`${this.labels.get(id)}: ${next + 1} из ${this.order.length}`);
           this.kick();
         }
-      } else if (e.key === " " || e.key === "Enter") {
+      } else if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         this.drop();
-      } else if (e.key === "Escape") {
+      } else if (e.key === 'Escape') {
         e.preventDefault();
         d.index = d.from;
         this.drop();
@@ -221,24 +239,34 @@ export class StackEngine {
     if (d) return;
 
     const i = this.order.indexOf(id);
-    if (e.key === " " || e.key === "Enter") {
+    if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       const el = this.els.get(id);
-      if (el) el.style.transformOrigin = "50% 50%";
+      if (el) el.style.transformOrigin = '50% 50%';
       this.drag = {
-        id, mode: "keyboard", pointerId: -1,
-        offX: 0, offY: 0, px: 0, py: 0, t: 0, vx: 0, vy: 0,
-        index: i, from: i, width: 0,
+        id,
+        mode: 'keyboard',
+        pointerId: -1,
+        offX: 0,
+        offY: 0,
+        px: 0,
+        py: 0,
+        t: 0,
+        vx: 0,
+        vy: 0,
+        index: i,
+        from: i,
+        width: 0,
       };
       this.cb.announce(
         `Взято: ${this.labels.get(id)}. Стрелки — двигать, пробел — положить, Esc — отмена`,
       );
       this.kick();
-    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault();
-      const target = this.order[i + (e.key === "ArrowUp" ? -1 : 1)];
+      const target = this.order[i + (e.key === 'ArrowUp' ? -1 : 1)];
       if (target) this.els.get(target)?.focus({ preventScroll: true });
-    } else if (e.key === "Delete" || e.key === "Backspace") {
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault();
       const neighbour = this.order[i + 1] ?? this.order[i - 1];
       this.fling(id, 1600, -200);
@@ -255,10 +283,10 @@ export class StackEngine {
     this.order = next;
     if (changed) {
       // React переставит DOM-узлы и уронит фокус — вернём его после sync.
-      if (d.mode === "keyboard") this.refocus = d.id;
+      if (d.mode === 'keyboard') this.refocus = d.id;
       this.cb.reorder(next);
     }
-    if (d.mode === "keyboard") {
+    if (d.mode === 'keyboard') {
       const label = this.labels.get(d.id);
       this.cb.announce(
         changed ? `${label}: место ${next.indexOf(d.id) + 1}` : `${label}: без изменений`,
@@ -279,7 +307,7 @@ export class StackEngine {
     b.vr = vx * 0.05;
     this.order = this.order.filter((x) => x !== id);
 
-    const item = { id, text: this.labels.get(id) ?? "" };
+    const item = { id, text: this.labels.get(id) ?? '' };
     const dir = Math.sign(vx) || 1;
     const t = window.setTimeout(() => {
       this.timers.delete(t);
@@ -314,7 +342,7 @@ export class StackEngine {
     let busy = d !== null;
 
     // Палец замер — наклон плавно уходит.
-    if (d?.mode === "pointer" && t - d.t > 40) d.vx *= Math.exp(-dt * 12);
+    if (d?.mode === 'pointer' && t - d.t > 40) d.vx *= Math.exp(-dt * 12);
 
     this.visual().forEach((id, i) => {
       const b = this.bodies.get(id);
@@ -325,7 +353,7 @@ export class StackEngine {
         return;
       }
       const held = d?.id === id;
-      const follow = held && d.mode === "pointer";
+      const follow = held && d.mode === 'pointer';
       const tx = 0;
       const ty = i * PITCH;
       const tr = follow ? clamp(d.vx * 0.012, -12, 12) : 0;
@@ -343,13 +371,21 @@ export class StackEngine {
       b.o += (to - b.o) * Math.min(1, dt * 12);
 
       const settled =
-        Math.abs(b.x - tx) < 0.05 && Math.abs(b.vx) < 0.05 &&
-        Math.abs(b.y - ty) < 0.05 && Math.abs(b.vy) < 0.05 &&
-        Math.abs(b.r - tr) < 0.01 && Math.abs(b.vr) < 0.05 &&
-        Math.abs(b.s - ts) < 0.0005 && Math.abs(b.vs) < 0.001 &&
+        Math.abs(b.x - tx) < 0.05 &&
+        Math.abs(b.vx) < 0.05 &&
+        Math.abs(b.y - ty) < 0.05 &&
+        Math.abs(b.vy) < 0.05 &&
+        Math.abs(b.r - tr) < 0.01 &&
+        Math.abs(b.vr) < 0.05 &&
+        Math.abs(b.s - ts) < 0.0005 &&
+        Math.abs(b.vs) < 0.001 &&
         Math.abs(b.o - to) < 0.005;
       if (settled && !held) {
-        b.x = tx; b.y = ty; b.r = tr; b.s = ts; b.o = to;
+        b.x = tx;
+        b.y = ty;
+        b.r = tr;
+        b.s = ts;
+        b.o = to;
         b.vx = b.vy = b.vr = b.vs = 0;
       } else {
         busy = true;
@@ -382,7 +418,7 @@ export class StackEngine {
     if (!el) return;
     el.style.transform = `translate3d(${b.x}px, ${b.y}px, 0) rotate(${b.r}deg) scale(${b.s})`;
     el.style.opacity = String(b.o);
-    el.style.setProperty("--lift", String(clamp((b.s - 1) / (LIFT - 1), 0, 1)));
+    el.style.setProperty('--lift', String(clamp((b.s - 1) / (LIFT - 1), 0, 1)));
 
     const z = this.drag?.id === id ? 3 : b.flying ? 2 : b.s > 1.002 ? 1 : 0;
     if (z !== b.z) {
@@ -391,9 +427,9 @@ export class StackEngine {
     }
     // Номера пересчитываются на лету, пока карточка в пути.
     if (index >= 0) {
-      const num = String(index + 1).padStart(2, "0");
+      const num = String(index + 1).padStart(2, '0');
       if (num !== b.num) {
-        const node = el.querySelector("[data-num]");
+        const node = el.querySelector('[data-num]');
         if (node) node.textContent = num;
         b.num = num;
       }

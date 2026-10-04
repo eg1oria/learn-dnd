@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import Stack from "@/components/stack/Stack";
+import type { Metadata } from 'next';
+import Stack from '@/components/stack/Stack';
 
 export const metadata: Metadata = {
-  title: "Stack",
+  title: 'Stack',
 };
 
 export default function StackPage() {
